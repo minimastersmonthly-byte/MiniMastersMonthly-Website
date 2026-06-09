@@ -87,6 +87,48 @@ const INITIAL_STICKS_STATS: SticksStats[] = [
   { playerName: 'Lucas', gamesPlayed: 0, goals: 0, hits: 0, wins: 0, losses: 0 },
 ];
 
+const ConfettiRain = () => {
+  // Generate stable array of celebratory particles
+  const particles = Array.from({ length: 24 }, (_, i) => ({
+    id: i,
+    emoji: ['🏆', '⛳', '🏒', '✨', '🎉', '🔥', '🥇', '⚡'][i % 8],
+    left: `${(i * 17) % 95 + 2.5}%`, // Pseudo-random left alignments spread naturally
+    delay: (i * 0.25) % 4,
+    duration: 3 + ((i * 1.5) % 4),
+    size: 15 + ((i * 7) % 15),
+  }));
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ y: '115%', opacity: 0, scale: 0.6, rotate: 0 }}
+          animate={{ 
+            y: '-15%', 
+            opacity: [0, 1, 1, 0], 
+            scale: [0.7, 1.2, 1, 0.6],
+            rotate: 360 
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut"
+          }}
+          className="absolute font-sans select-none"
+          style={{ 
+            left: p.left,
+            fontSize: `${p.size}px`,
+          }}
+        >
+          {p.emoji}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -103,6 +145,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedPlayer, setSelectedPlayer] = React.useState<SimplePlayer | null>(null);
   const [activeTab, setActiveTab] = React.useState<'home' | 'golf' | 'sticks'>('home');
+  const [simulateTournamentDay, setSimulateTournamentDay] = React.useState(true);
   const channelUrl = "https://www.youtube.com/channel/UCea7OUO7NT3Lifx9fH19mpg";
 
   // Next Scheduled Tournament Countdown: July 11, 2026
@@ -382,35 +425,73 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 className={`p-6 rounded-2xl border mb-10 text-left transition-all duration-300 relative overflow-hidden shadow-xs ${
-                  isDarkMode 
-                    ? 'bg-gradient-to-r from-[#0d1612] to-[#111c16] border-emerald-950 text-white' 
-                    : 'bg-gradient-to-r from-emerald-50/20 to-emerald-50/5 border-[#cbd5cc]/50 text-slate-800'
+                  simulateTournamentDay
+                    ? (isDarkMode 
+                        ? 'bg-gradient-to-r from-[#1c1c0a] via-[#111c16] to-[#0a1612] border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] text-white' 
+                        : 'bg-gradient-to-r from-amber-50/40 via-emerald-50/20 to-emerald-50/5 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)] text-slate-800')
+                    : (isDarkMode 
+                        ? 'bg-gradient-to-r from-[#0d1612] to-[#111c16] border-emerald-950 text-white' 
+                        : 'bg-gradient-to-r from-emerald-50/20 to-emerald-50/5 border-[#cbd5cc]/50 text-slate-800')
                 }`}
               >
+                {/* Visual celebratory effects when countdown is 0 */}
+                {simulateTournamentDay && <ConfettiRain />}
+
                 {/* Micro sport lines pattern overlay */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-[9px] font-black uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> TOURNAMENT COUNTDOWN
-                    </div>
-                    <h3 className={`text-md font-black uppercase tracking-tight transition-colors duration-200 ${isDarkMode ? 'text-white' : 'text-[#152e1d]'}`}>
-                      MiniMastersMonthly Tournament
+                    {simulateTournamentDay ? (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-[9px] font-black uppercase tracking-wider animate-pulse">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> LIVE • TOURNAMENT DAY
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-[9px] font-black uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> TOURNAMENT COUNTDOWN
+                      </div>
+                    )}
+                    <h3 className={`text-md font-black uppercase tracking-tight transition-colors duration-200 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-[#152e1d]'}`}>
+                      {simulateTournamentDay ? (
+                        <span className="flex items-center gap-1 text-amber-500">
+                          🏆 MiniMastersMonthly Tournament is LIVE!
+                        </span>
+                      ) : (
+                        "MiniMastersMonthly Tournament"
+                      )}
                     </h3>
-                    <p className={`text-[11px] transition-colors duration-200 flex items-center gap-1.5 ${isDarkMode ? 'text-slate-450' : 'text-[#3c4a40]'}`}>
-                      <Calendar className="w-3.5 h-3.5 text-emerald-555" /> Scheduled for: <span className="font-semibold text-emerald-600 dark:text-emerald-450">not scheduled yet</span>
-                    </p>
+                    <div className="flex items-center flex-wrap gap-2">
+                      <p className={`text-[11px] transition-colors duration-200 flex items-center gap-1.5 ${isDarkMode ? 'text-slate-450' : 'text-[#3c4a40]'}`}>
+                        <Calendar className="w-3.5 h-3.5 text-emerald-555" /> Scheduled for:{" "}
+                        <span className={`font-semibold transition-colors ${simulateTournamentDay ? 'text-amber-500 animate-pulse font-black' : 'text-emerald-600 dark:text-emerald-450'}`}>
+                          {simulateTournamentDay ? "TODAY IS THE DAY!" : "not scheduled yet"}
+                        </span>
+                      </p>
+                    </div>
                   </div>
 
-                  <div className={`p-4 md:px-5 md:py-3.5 rounded-xl border flex items-center gap-4 shrink-0 transition-colors duration-200 ${
-                    isDarkMode 
-                      ? 'bg-[#14221a]/60 border-emerald-900/30' 
-                      : 'bg-white border-[#cbd5cc]/60 shadow-xs'
+                  <div className={`p-4 md:px-5 md:py-3.5 rounded-xl border flex items-center gap-4 shrink-0 transition-all duration-300 ${
+                    simulateTournamentDay
+                      ? (isDarkMode 
+                          ? 'bg-amber-950/20 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)] scale-105' 
+                          : 'bg-amber-50 border-amber-300 shadow-sm scale-105')
+                      : (isDarkMode 
+                          ? 'bg-[#14221a]/60 border-emerald-900/30' 
+                          : 'bg-white border-[#cbd5cc]/60 shadow-xs')
                   }`}>
-                    <span className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none">
-                      --
-                    </span>
+                    {simulateTournamentDay ? (
+                      <motion.span 
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none block"
+                      >
+                        0
+                      </motion.span>
+                    ) : (
+                      <span className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none">
+                        --
+                      </span>
+                    )}
                     <div className="leading-tight">
                       <span className={`block text-[8.5px] font-black uppercase tracking-widest transition-colors duration-200 ${isDarkMode ? 'text-slate-400' : 'text-[#3c4a40]/80'}`}>DAYS</span>
                       <span className="block text-[10px] font-black text-emerald-600 dark:text-emerald-450 uppercase tracking-widest">REMAINING</span>
