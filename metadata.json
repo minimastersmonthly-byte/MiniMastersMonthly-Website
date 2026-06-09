@@ -1,0 +1,6 @@
+{
+  "name": "Monthly Mini Golf & Mini Sticks Hub",
+  "description": "Official tournament hub, leaderboard, and player stats for the Monthly Mini Golf and Mini Sticks Tournaments YouTube Channel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
