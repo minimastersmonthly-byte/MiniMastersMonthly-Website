@@ -129,6 +129,60 @@ const ConfettiRain = () => {
   );
 };
 
+const FlipDigit = ({ digit, isDarkMode }: { digit: string; isDarkMode: boolean; key?: any }) => {
+  return (
+    <div className="relative flex flex-col items-center">
+      {/* 3D Flip Card Outer Box */}
+      <div 
+        className={`relative w-9 h-12 sm:w-11 sm:h-15 rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center font-mono font-black text-2xl sm:text-3xl select-none transition-colors duration-200 ${
+          isDarkMode 
+            ? 'bg-[#0f1814] border border-emerald-950 text-amber-500' 
+            : 'bg-[#152e1d] border border-[#1b3b25] text-amber-400'
+        }`}
+        style={{ perspective: '300px' }}
+      >
+        {/* Top static half */}
+        <div className={`absolute inset-x-0 top-0 h-[50%] overflow-hidden flex items-end justify-center border-b ${
+          isDarkMode ? 'bg-[#0c1210]/60 border-emerald-950/40' : 'bg-[#112618]/60 border-[#112618]/30'
+        }`}>
+          <span className="translate-y-[50%] tracking-tight block pb-1 font-semibold leading-none">{digit}</span>
+        </div>
+
+        {/* Bottom static half */}
+        <div className={`absolute inset-x-0 bottom-0 h-[50%] overflow-hidden flex items-start justify-center ${
+          isDarkMode ? 'bg-[#0f1814]' : 'bg-[#152e1d]'
+        }`}>
+          <span className="-translate-y-[50%] tracking-tight block pt-1 leading-none">{digit}</span>
+        </div>
+
+        {/* Horizontal Divider Cut line */}
+        <div className={`absolute inset-x-0 top-[50%] h-[1.5px] z-20 ${
+          isDarkMode ? 'bg-black/80' : 'bg-black/90'
+        }`} />
+
+        {/* Flipping card active animator */}
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={digit}
+            initial={{ rotateX: 90, opacity: 0 }}
+            animate={{ rotateX: 0, opacity: 1 }}
+            exit={{ rotateX: -90, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 220, damping: 18 }}
+            style={{ 
+              transformOrigin: '50% 50%',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+            }}
+            className="absolute inset-0 flex items-center justify-center z-10 select-none pb-0.5 leading-none"
+          >
+            {digit}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -479,24 +533,43 @@ export default function App() {
                           ? 'bg-[#14221a]/60 border-emerald-900/30' 
                           : 'bg-white border-[#cbd5cc]/60 shadow-xs')
                   }`}>
-                    {simulateTournamentDay ? (
-                      <motion.span 
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                        className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none block"
-                      >
-                        0
-                      </motion.span>
-                    ) : (
-                      <span className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none">
-                        {daysRemaining}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {String(simulateTournamentDay ? 0 : daysRemaining)
+                        .padStart(2, '0')
+                        .split('')
+                        .map((char, charIdx) => (
+                          <FlipDigit key={charIdx} digit={char} isDarkMode={isDarkMode} />
+                        ))}
+                    </div>
                     <div className="leading-tight">
                       <span className={`block text-[8.5px] font-black uppercase tracking-widest transition-colors duration-200 ${isDarkMode ? 'text-slate-400' : 'text-[#3c4a40]/80'}`}>DAYS</span>
                       <span className="block text-[10px] font-black text-emerald-600 dark:text-emerald-450 uppercase tracking-widest">REMAINING</span>
                     </div>
                   </div>
+                </div>
+              </motion.div>
+
+              {/* Video Release Schedule Info Banner */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.15 }}
+                className={`p-4 rounded-xl border mb-10 text-left transition-all duration-200 flex items-start gap-3 shadow-xs ${
+                  isDarkMode 
+                    ? 'bg-[#101512] border-emerald-950 text-slate-200' 
+                    : 'bg-emerald-50/10 border-slate-200 text-[#3c4a40]'
+                }`}
+              >
+                <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 border ${
+                  isDarkMode ? 'bg-[#1c1214] border-red-950 text-red-500' : 'bg-red-50 border-red-100 text-red-650'
+                }`}>
+                  <Youtube className="w-4 h-4" />
+                </div>
+                <div className="text-xs space-y-1">
+                  <span className="font-extrabold uppercase tracking-wider text-[9px] text-amber-500 block font-mono">YouTube Video Premiere</span>
+                  <p className="leading-relaxed font-sans">
+                    The <strong className="font-semibold text-emerald-600 dark:text-emerald-450">minimastersmonthly</strong> tournament video is scheduled for <span className="font-semibold text-[#152e1d] dark:text-amber-400">June 15, 2026</span> because of editing. Subscribe to keep your notifications live!
+                  </p>
                 </div>
               </motion.div>
 
