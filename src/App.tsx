@@ -145,14 +145,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedPlayer, setSelectedPlayer] = React.useState<SimplePlayer | null>(null);
   const [activeTab, setActiveTab] = React.useState<'home' | 'golf' | 'sticks'>('home');
-  const [simulateTournamentDay, setSimulateTournamentDay] = React.useState(true);
   const channelUrl = "https://www.youtube.com/channel/UCea7OUO7NT3Lifx9fH19mpg";
 
-  // Next Scheduled Tournament Countdown: July 11, 2026
-  const tournamentTargetDate = new Date('2026-07-11T00:00:00');
+  // Next Scheduled Tournament Countdown: June 11, 2026
+  const tournamentTargetDate = new Date('2026-06-11T00:00:00');
   const currentDate = new Date();
   const timeDifference = tournamentTargetDate.getTime() - currentDate.getTime();
   const daysRemaining = Math.max(0, Math.ceil(timeDifference / (1000 * 60 * 60 * 24)));
+  const simulateTournamentDay = daysRemaining === 0;
 
   // State Management for Statistics dashboards
   const [golfStats, setGolfStats] = React.useState<GolfStats[]>(INITIAL_GOLF_STATS);
@@ -464,7 +464,7 @@ export default function App() {
                       <p className={`text-[11px] transition-colors duration-200 flex items-center gap-1.5 ${isDarkMode ? 'text-slate-450' : 'text-[#3c4a40]'}`}>
                         <Calendar className="w-3.5 h-3.5 text-emerald-555" /> Scheduled for:{" "}
                         <span className={`font-semibold transition-colors ${simulateTournamentDay ? 'text-amber-500 animate-pulse font-black' : 'text-emerald-600 dark:text-emerald-450'}`}>
-                          {simulateTournamentDay ? "TODAY IS THE DAY!" : "not scheduled yet"}
+                          {simulateTournamentDay ? "TODAY IS THE DAY!" : "June 11, 2026"}
                         </span>
                       </p>
                     </div>
@@ -489,7 +489,7 @@ export default function App() {
                       </motion.span>
                     ) : (
                       <span className="text-3xl md:text-4xl font-black text-amber-500 font-mono tracking-tighter select-none">
-                        --
+                        {daysRemaining}
                       </span>
                     )}
                     <div className="leading-tight">
