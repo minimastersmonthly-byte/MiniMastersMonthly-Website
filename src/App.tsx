@@ -935,9 +935,35 @@ export default function App() {
                       </p>
                     </div>
                   ) : selectedPlayer.name.toLowerCase() === 'darrian' ? (
-                    <div className={`space-y-3 text-xs leading-relaxed transition-colors duration-200 ${isDarkMode ? 'text-slate-205' : 'text-slate-705'}`}>
-                      <p>
-                        My name is Darrian. I like watermelon, fried chicken, and Kool-Aid.
+                    <div className={`space-y-2 text-xs leading-relaxed transition-colors duration-200 ${isDarkMode ? 'text-slate-205' : 'text-slate-705'}`}>
+                      <ul className="space-y-2 font-sans">
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">🩹</span>
+                          <span><strong className="font-bold">MEDICAL UPDATE:</strong> 90% carpet burn, 10% human.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">🧎‍♂️</span>
+                          <span><strong className="font-bold">STANCE:</strong> Permanently on my knees since 2012.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">🩳</span>
+                          <span><strong className="font-bold">GEAR:</strong> Shin guards made of taped-up cardboard.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">☄️</span>
+                          <span><strong className="font-bold">PLAYSTYLE:</strong> Blindly slapping a foam ball into the drywall.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">🛋️</span>
+                          <span><strong className="font-bold">TERRITORY:</strong> The hallway is my Madison Square Garden.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="shrink-0">🚪</span>
+                          <span><strong className="font-bold">STATS:</strong> 3 goals, 47 broken lamps, 1 eviction notice.</span>
+                        </li>
+                      </ul>
+                      <p className="pt-2 italic font-black text-amber-500 border-t border-[#cbd5cc]/50 dark:border-emerald-950/50 mt-2 text-[11px] leading-snug">
+                        🫵 “If you aren’t diving over the coffee table, do you even care about the sport?”
                       </p>
                     </div>
                   ) : selectedPlayer.name.toLowerCase() === 'lucas' ? (
