@@ -94,10 +94,10 @@ const SUBSTITUTES: SimplePlayer[] = [
 ];
 
 const INITIAL_GOLF_STATS: GolfStats[] = [
-  { playerName: 'Spencer', gold: 1, silver: 0, bronze: 0, holesInOne: 8 },
+  { playerName: 'Spencer', gold: 1, silver: 0, bronze: 1, holesInOne: 8 },
   { playerName: 'Caleb', gold: 0, silver: 1, bronze: 0, holesInOne: 6 },
-  { playerName: 'Nathan', gold: 0, silver: 0, bronze: 1, holesInOne: 3 },
-  { playerName: 'Darrian', gold: 0, silver: 0, bronze: 0, holesInOne: 7 },
+  { playerName: 'Nathan', gold: 0, silver: 1, bronze: 1, holesInOne: 3 },
+  { playerName: 'Darrian', gold: 1, silver: 0, bronze: 0, holesInOne: 7 },
   { playerName: 'Max', gold: 0, silver: 0, bronze: 0, holesInOne: 0 },
   { playerName: 'Lucas', gold: 0, silver: 0, bronze: 0, holesInOne: 0 },
 ];
@@ -164,79 +164,6 @@ const INITIAL_RECENT_MATCHES: RecentMatch[] = [
   },
 ];
 
-const ConfettiRain = () => {
-  const particles = Array.from({ length: 24 }, (_, i) => ({
-    id: i,
-    emoji: ['🏆', '⛳', '🏒', '✨', '🎉', '🥇', '🥈', '🥉'][i % 8],
-    left: `${(i * 14) % 96 + 2}%`,
-    delay: (i * 0.25) % 3,
-    duration: 2.8 + ((i * 1.1) % 3),
-    size: 18 + ((i * 4) % 12),
-  }));
-
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          initial={{ y: '110%', opacity: 0, scale: 0.6, rotate: 0 }}
-          animate={{ 
-            y: '-20%', 
-            opacity: [0, 1, 1, 0], 
-            scale: [0.7, 1.2, 1, 0.6],
-            rotate: 360 
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: "easeInOut"
-          }}
-          className="absolute select-none"
-          style={{ 
-            left: p.left,
-            fontSize: `${p.size}px`,
-          }}
-        >
-          {p.emoji}
-        </motion.div>
-      ))}
-    </div>
-  );
-};
-
-interface FlipDigitProps {
-  digit: string;
-  isDarkMode: boolean;
-  key?: React.Key;
-}
-
-const FlipDigit = ({ digit, isDarkMode }: FlipDigitProps) => {
-  return (
-    <div className="relative flex flex-col items-center">
-      <div 
-        className={`relative w-8 h-12 sm:w-11 sm:h-16 rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center font-mono font-black text-xl sm:text-2xl select-none transition-colors duration-200 ${
-          isDarkMode 
-            ? 'bg-[#0f1814] border border-emerald-950 text-amber-400' 
-            : 'bg-[#152e1d] border border-[#1b3b25] text-amber-300'
-        }`}
-      >
-        <div className={`absolute inset-x-0 top-0 h-[50%] overflow-hidden flex items-end justify-center border-b ${
-          isDarkMode ? 'bg-[#0c1210]/70 border-emerald-950/40' : 'bg-[#112618]/70 border-[#112618]/30'
-        }`}>
-          <span className="translate-y-[50%] tracking-tight block pb-1 font-semibold leading-none">{digit}</span>
-        </div>
-        <div className={`absolute inset-x-0 bottom-0 h-[50%] overflow-hidden flex items-start justify-center ${
-          isDarkMode ? 'bg-[#0f1814]' : 'bg-[#152e1d]'
-        }`}>
-          <span className="-translate-y-[50%] tracking-tight block pt-1 leading-none">{digit}</span>
-        </div>
-        <div className="absolute inset-x-0 top-[50%] h-[1.5px] z-20 bg-black/80" />
-      </div>
-    </div>
-  );
-};
-
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -255,11 +182,8 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  const [activeTab, setActiveTab] = useState<'home' | 'golf' | 'sticks' | 'rules'>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<SimplePlayer | null>(null);
-  const [simulateTournamentDay, setSimulateTournamentDay] = useState(false);
-  const [daysRemaining] = useState(31);
   const channelUrl = "https://www.youtube.com/channel/UCea7OUO7NT3Lifx9fH19mpg";
   const channelVideosUrl = "https://www.youtube.com/@MiniMastersMonthly/videos";
 
@@ -283,16 +207,6 @@ export default function App() {
   const [golfStrokes, setGolfStrokes] = useState<number[]>([2, 1, 2, 2, 3]);
   const [golfMedal, setGolfMedal] = useState<'none' | 'gold' | 'silver' | 'bronze'>('none');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Navigation tabs horizontal scroll controller for easy access
-  const navScrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollNav = (direction: 'left' | 'right') => {
-    if (navScrollRef.current) {
-      const scrollAmount = direction === 'left' ? -180 : 180;
-      navScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -429,178 +343,44 @@ export default function App() {
         {/* Clean minimal glowing athletic bar */}
         <div className="w-full h-1.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-amber-500 rounded-full mb-6" />
         
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b pb-6 mb-8">
-          {/* Left Side: Logo */}
-          <div className="flex items-center justify-between w-full lg:w-auto shrink-0">
-            <div className="flex items-center gap-3">
-              <div className={`p-2.5 rounded-lg border transition-all duration-200 ${
-                isDarkMode ? 'bg-[#121a15] border-emerald-800/40 text-emerald-400 shadow-md shadow-emerald-950/20' : 'bg-[#eaf5ec] border-emerald-600/20 text-emerald-800 shadow-sm'
-              }`}>
-                <Trophy className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <span className={`block text-[9px] font-black uppercase tracking-widest font-mono transition-colors duration-200 ${
-                  isDarkMode ? 'text-emerald-400' : 'text-emerald-700'
-                }`}>⚡ LEAGUE ACTION HUB & STANDINGS</span>
-                <span className={`font-black text-xl md:text-2xl tracking-tight font-sans transition-colors duration-200 ${
-                  isDarkMode ? 'text-white' : 'text-[#14301d]'
-                }`}>MINI MASTERS MONTHLY</span>
-              </div>
+        <div className="flex items-center justify-between pb-6 mb-8 border-b border-[#cbd5cc]/50 dark:border-emerald-950/40">
+          {/* Logo & Title */}
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-lg border transition-all duration-200 ${
+              isDarkMode ? 'bg-[#121a15] border-emerald-800/40 text-emerald-400 shadow-md shadow-emerald-950/20' : 'bg-[#eaf5ec] border-emerald-600/20 text-emerald-800 shadow-sm'
+            }`}>
+              <Trophy className="w-5 h-5" />
             </div>
-            
-            {/* On mobile devices, place the Theme toggle here inside the Logo container */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`p-2 rounded-md border transition-all duration-150 flex items-center justify-center cursor-pointer shadow-xs ${
-                  isDarkMode 
-                    ? 'bg-[#0f1411] border-[#1d2c22] text-amber-400 hover:bg-[#151c18]' 
-                    : 'bg-[#eaefe9] border-[#cbd5cc] text-[#152e1d] hover:bg-white'
-                }`}
-                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                aria-label="Toggle Theme"
-              >
-                {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-emerald-850" />}
-              </button>
+            <div className="text-left">
+              <span className={`block text-[9px] font-black uppercase tracking-widest font-mono transition-colors duration-200 ${
+                isDarkMode ? 'text-emerald-400' : 'text-emerald-700'
+              }`}>⚡ LEAGUE ACTION HUB & STANDINGS</span>
+              <span className={`font-black text-xl md:text-2xl tracking-tight font-sans transition-colors duration-200 ${
+                isDarkMode ? 'text-white' : 'text-[#14301d]'
+              }`}>MINI MASTERS MONTHLY</span>
             </div>
           </div>
 
-          {/* Center Column: Navigation Tabs with smooth scroll bar and easy access arrow buttons */}
-          <div className="w-full lg:w-auto flex items-center justify-center lg:justify-start gap-1 py-1 max-w-full">
-            <button
-              onClick={() => scrollNav('left')}
-              className={`p-2 rounded-lg border transition-all shrink-0 cursor-pointer shadow-xs flex items-center justify-center ${
-                isDarkMode 
-                  ? 'bg-[#0f1411] border-[#1d2c22] text-slate-400 hover:text-white hover:bg-[#18231c]' 
-                  : 'bg-[#eaefe9] border-[#cbd5cc] text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-              title="Scroll tabs left"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-
-            <div 
-              ref={navScrollRef}
-              className="overflow-x-auto scroll-smooth py-1 max-w-[calc(100vw-120px)] lg:max-w-none"
-              style={{
-                scrollbarWidth: 'thin',
-              }}
-            >
-              <div className={`flex items-center gap-1 p-1 rounded-xl border transition-colors duration-200 shrink-0 select-none w-max ${
-                isDarkMode ? 'bg-[#0c110d] border-[#1d2c22]' : 'bg-[#eaefe9] border-[#cbd5cc]'
-              }`}>
-                <button
-                  onClick={() => setActiveTab('home')}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                    activeTab === 'home' 
-                      ? isDarkMode 
-                        ? 'bg-[#18251e] border border-emerald-800/30 text-emerald-400 shadow-xs' 
-                        : 'bg-white border border-[#cbd5cc] text-[#152e1d] shadow-sm' 
-                      : isDarkMode 
-                        ? 'text-slate-400 hover:text-slate-200' 
-                        : 'text-[#485e4f] hover:text-[#152e1d]'
-                  }`}
-                >
-                  <Users className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Crew Registry</span><span className="sm:hidden">Crew</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('golf')}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                    activeTab === 'golf' 
-                      ? isDarkMode 
-                        ? 'bg-[#14261b] border border-emerald-700/30 text-emerald-400 shadow-xs' 
-                        : 'bg-white border border-[#cbd5cc] text-[#152e1d] shadow-sm' 
-                      : isDarkMode 
-                        ? 'text-slate-400 hover:text-slate-200' 
-                        : 'text-[#485e4f] hover:text-[#152e1d]'
-                  }`}
-                >
-                  <Trees className="w-3.5 h-3.5" /> ⛳ <span className="hidden sm:inline">Mini Golf Standings</span><span className="sm:hidden">Golf</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('sticks')}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                    activeTab === 'sticks' 
-                      ? isDarkMode 
-                        ? 'bg-[#101b22] border border-blue-900/30 text-blue-300 shadow-xs' 
-                        : 'bg-white border border-[#cbd5cc] text-slate-800 shadow-sm' 
-                      : isDarkMode 
-                        ? 'text-slate-400 hover:text-slate-200' 
-                        : 'text-[#485e4f] hover:text-[#152e1d]'
-                  }`}
-                >
-                  <Goal className="w-3.5 h-3.5" /> 🏒 <span className="hidden sm:inline">Mini Stick Standings</span><span className="sm:hidden">Sticks</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('rules')}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                    activeTab === 'rules' 
-                      ? isDarkMode 
-                        ? 'bg-[#18251e] border border-emerald-800/30 text-emerald-400 shadow-xs' 
-                        : 'bg-white border border-[#cbd5cc] text-[#152e1d] shadow-sm' 
-                      : isDarkMode 
-                        ? 'text-slate-400 hover:text-slate-200' 
-                        : 'text-[#485e4f] hover:text-[#152e1d]'
-                  }`}
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-amber-400" /> <span className="hidden sm:inline">Official Rulebook</span><span className="sm:hidden">Rulebook</span>
-                </button>
-              </div>
-            </div>
-
-            <button
-              onClick={() => scrollNav('right')}
-              className={`p-2 rounded-lg border transition-all shrink-0 cursor-pointer shadow-xs flex items-center justify-center ${
-                isDarkMode 
-                  ? 'bg-[#0f1411] border-[#1d2c22] text-slate-400 hover:text-white hover:bg-[#18231c]' 
-                  : 'bg-[#eaefe9] border-[#cbd5cc] text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-              title="Scroll tabs right"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Right Side: Theme Toggle & YouTube Subscribe Action */}
-          <div className="flex items-center justify-center lg:justify-end gap-3 shrink-0">
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`hidden lg:flex p-2 rounded-md border transition-all duration-150 items-center justify-center cursor-pointer shadow-xs ${
-                isDarkMode 
-                  ? 'bg-[#0f1411] border-[#1d2c22] text-amber-400 hover:bg-[#151c18]' 
-                  : 'bg-[#eaefe9] border-[#cbd5cc] text-[#152e1d] hover:bg-white'
-              }`}
-              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              aria-label="Toggle Theme"
-            >
-              {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-emerald-800" />}
-            </button>
-
-            <a
-              href={channelUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 transition rounded-md text-xs font-bold text-white shadow-xs flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
-            >
-              <Youtube className="w-3.5 h-3.5" />
-              Subscribe Channel
-            </a>
-          </div>
+          {/* Theme Toggle */}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className={`p-2 rounded-md border transition-all duration-150 flex items-center justify-center cursor-pointer shadow-xs ${
+              isDarkMode 
+                ? 'bg-[#0f1411] border-[#1d2c22] text-amber-400 hover:bg-[#151c18]' 
+                : 'bg-[#eaefe9] border-[#cbd5cc] text-[#152e1d] hover:bg-white'
+            }`}
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Toggle Theme"
+          >
+            {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-emerald-800" />}
+          </button>
         </div>
 
-        {/* Main Tab Render blocks */}
-        <AnimatePresence mode="wait">
-          {activeTab === 'home' && (
-            <motion.div
-              key="home"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-            >
-              {/* Hero Banner inside the primary Home page */}
+        {/* Main Content Sections */}
+        <div className="space-y-16">
+          {/* Section 1: Hero & Crew Registry */}
+          <div className="space-y-10 text-left">
+            {/* Hero Banner inside the primary Home page */}
               <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#122c1b] via-[#09180e] to-[#050e08] border border-emerald-800/30 p-8 md:p-12 mb-10 shadow-lg text-left text-white animate-fade-in">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-amber-500/[0.04] rounded-full blur-3xl pointer-events-none" />
@@ -621,90 +401,6 @@ export default function App() {
                   </p>
                 </div>
               </div>
-
-              {/* Tournament Countdown Timer */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className={`p-6 rounded-2xl border mb-10 text-left transition-all duration-300 relative overflow-hidden shadow-xs ${
-                  simulateTournamentDay
-                    ? (isDarkMode 
-                        ? 'bg-gradient-to-r from-[#1c1c0a] via-[#111c16] to-[#0a1612] border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] text-white' 
-                        : 'bg-gradient-to-r from-amber-50/40 via-emerald-50/20 to-emerald-50/5 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)] text-slate-800')
-                    : (isDarkMode 
-                        ? 'bg-gradient-to-r from-[#0d1612] to-[#111c16] border-emerald-950 text-white' 
-                        : 'bg-gradient-to-r from-emerald-50/20 to-emerald-50/5 border-[#cbd5cc]/50 text-slate-800')
-                }`}
-              >
-                {simulateTournamentDay && <ConfettiRain />}
-
-                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <div className="space-y-1.5">
-                    {simulateTournamentDay ? (
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-[9px] font-black uppercase tracking-wider animate-pulse">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> LIVE • TOURNAMENT DAY
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-[9px] font-black uppercase tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> TOURNAMENT COUNTDOWN
-                      </div>
-                    )}
-                    <h3 className={`text-md font-black uppercase tracking-tight transition-colors duration-200 flex items-center gap-2 ${
-                      isDarkMode ? 'text-white' : 'text-[#152e1d]'
-                    }`}>
-                      {simulateTournamentDay ? (
-                        <span className="flex items-center gap-1 text-amber-500">
-                          🏆 MiniMastersMonthly Tournament is LIVE!
-                        </span>
-                      ) : (
-                        "MiniMastersMonthly Tournament"
-                      )}
-                    </h3>
-                    <div className="flex items-center flex-wrap gap-2">
-                      <p className={`text-[11px] transition-colors duration-200 flex items-center gap-1.5 ${
-                        isDarkMode ? 'text-slate-400' : 'text-[#3c4a40]'
-                      }`}>
-                        <Calendar className="w-3.5 h-3.5 text-emerald-500" /> Scheduled for:{" "}
-                        <span className={`font-semibold transition-colors ${
-                          simulateTournamentDay ? 'text-amber-500 animate-pulse font-black' : 'text-emerald-600 dark:text-emerald-400'
-                        }`}>
-                          {simulateTournamentDay ? "TODAY IS THE DAY!" : "September 12, 2026"}
-                        </span>
-                      </p>
-                    </div>
-
-                    {/* Notice about video release schedule */}
-                    <div className={`mt-3 p-2.5 rounded-lg border text-[11px] leading-tight flex items-start gap-2 ${
-                      isDarkMode ? 'bg-[#0a0f0c] border-emerald-950/80 text-slate-300' : 'bg-emerald-50/50 border-emerald-200/60 text-slate-700'
-                    }`}>
-                      <Youtube className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                      <span>
-                        The <strong className="font-semibold text-emerald-600 dark:text-emerald-400">minimastersmonthly</strong> tournament video is scheduled later than the event because of editing. Subscribe to keep your notifications live!
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={`p-4 md:px-5 md:py-3.5 rounded-xl border flex items-center gap-4 shrink-0 transition-all duration-300 ${
-                    simulateTournamentDay
-                      ? (isDarkMode ? 'bg-[#151c14] border-amber-500/40 text-amber-400' : 'bg-amber-100/50 border-amber-300 text-amber-900')
-                      : (isDarkMode ? 'bg-[#090d0b] border-emerald-950/60 text-emerald-400' : 'bg-white border-[#cbd5cc] text-emerald-800')
-                  }`}>
-                    <div className="flex items-center gap-1.5">
-                      {String(simulateTournamentDay ? 0 : daysRemaining)
-                        .padStart(2, '0')
-                        .split('')
-                        .map((digit, i) => (
-                          <FlipDigit key={i} digit={digit} isDarkMode={isDarkMode} />
-                        ))}
-                    </div>
-                    <div className="text-left font-mono">
-                      <span className="block text-[9.5px] font-black tracking-widest uppercase text-slate-400">DAYS</span>
-                      <span className="block text-xs font-black tracking-wider text-emerald-500">REMAINING</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
 
               {/* Competitors List Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 text-left">
@@ -825,19 +521,10 @@ export default function App() {
                   )}
                 </>
               )}
-            </motion.div>
-          )}
+            </div>
 
-          {/* Mini Golf statistics tab */}
-          {activeTab === 'golf' && (
-            <motion.div
-              key="golf"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6 text-left max-w-4xl mx-auto"
-            >
+            {/* Section 2: Mini Golf Standings Leaderboard */}
+            <div className="space-y-6 text-left max-w-4xl mx-auto">
               {/* stands leaderboard */}
               <div className={`rounded-xl overflow-hidden shadow-xs border transition-colors duration-200 ${
                 isDarkMode ? 'bg-[#101512] border-emerald-950' : 'bg-white border-slate-200'
@@ -933,19 +620,10 @@ export default function App() {
                   </table>
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
 
-          {/* Mini Sticks statistics page */}
-          {activeTab === 'sticks' && (
-            <motion.div
-              key="sticks"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6 text-left max-w-4xl mx-auto"
-            >
+            {/* Section 3: Mini Sticks Statistics */}
+            <div className="space-y-6 text-left max-w-4xl mx-auto">
               {/* Visual Win/Loss Records Bar Chart using recharts */}
               <div className={`rounded-xl overflow-hidden shadow-xs border p-5 transition-colors duration-200 ${
                 isDarkMode ? 'bg-[#101512] border-blue-900/40 text-white' : 'bg-white border-slate-200 text-[#0c2340]'
@@ -1056,7 +734,7 @@ export default function App() {
                     <p className={`text-[10px] mt-0.5 transition-colors duration-200 ${
                       isDarkMode ? 'text-slate-400' : 'text-slate-500'
                     }`}>
-                      Official cumulative statistics recorded from historical rink matches. Goal % is an estimate calculated as (career goals) ÷ 2, rounded to the nearest tenth, which means, for example, Spencer scores 16 goals every Mini Masters mini stick tournament.
+                      Official cumulative statistics recorded from historical rink matches. Avg Goals is calculated as (career goals) ÷ 2, rounded to the nearest tenth, representing average goals scored per monthly Mini Masters tournament.
                     </p>
                   </div>
                 </div>
@@ -1074,9 +752,9 @@ export default function App() {
                         <th className="py-3.5 px-3 text-center">Goals scored</th>
                         <th 
                           className="py-3.5 px-3 text-center" 
-                          title="Goal % is an estimate calculated as (career goals) ÷ 2, rounded to the nearest tenth, which means, for example, Spencer scores 16 goals every Mini Masters mini stick tournament."
+                          title="Avg Goals (per month) is calculated as (career goals) ÷ 2, rounded to the nearest tenth, representing average goals scored per monthly Mini Masters tournament."
                         >
-                          Goal % (Est.)
+                          Avg Goals (per month)
                         </th>
                       </tr>
                     </thead>
@@ -1085,8 +763,7 @@ export default function App() {
                     }`}>
                       {sortedSticksStats.map((stat) => {
                         const original = [...MEMBERS, ...SUBSTITUTES].find(m => m.name.toLowerCase() === stat.playerName.toLowerCase());
-                        // Goal percentage: for each goal scored divided by 2, rounded to nearest tenth
-                        const goalPct = (stat.goals / 2).toFixed(1) + '%';
+                        const avgGoalsPerMonth = (stat.goals / 2).toFixed(1);
 
                         return (
                           <tr key={stat.playerName} className={`transition-all ${
@@ -1132,12 +809,15 @@ export default function App() {
                               isDarkMode ? 'text-blue-400' : 'text-blue-600'
                             }`}>{stat.goals} Goals</td>
                             <td className="py-3.5 px-3 text-center">
-                              <span className={`font-mono tabular-nums text-xs font-black inline-flex items-center px-2 py-0.5 rounded border ${
-                                isDarkMode 
-                                  ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' 
-                                  : 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                              }`}>
-                                {goalPct}
+                              <span 
+                                title={`${stat.playerName} averages ${avgGoalsPerMonth} goals per monthly tournament`}
+                                className={`font-mono tabular-nums text-xs font-black inline-flex items-center px-2 py-0.5 rounded border ${
+                                  isDarkMode 
+                                    ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' 
+                                    : 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                                }`}
+                              >
+                                {avgGoalsPerMonth} / mo
                               </span>
                             </td>
                           </tr>
@@ -1147,22 +827,13 @@ export default function App() {
                   </table>
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
 
-          {/* Official Rulebook Tab */}
-          {activeTab === 'rules' && (
-            <motion.div
-              key="rules"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-            >
+            {/* Section 4: Official Rulebook */}
+            <div className="space-y-6 text-left">
               <OfficialRulebook isDarkMode={isDarkMode} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
 
         {/* Global Video Release Spotlight Banner */}
         <div className="relative mt-16 rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border border-emerald-500/20 p-8 flex flex-col lg:flex-row justify-between items-center text-center lg:text-left gap-6 shadow-md text-white select-none">
